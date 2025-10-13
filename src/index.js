@@ -1,19 +1,23 @@
 require('dotenv').config();
 const express = require('express');
+const config = require('./config');
+const apiRoutes = require('./api/routes');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 // Middleware for parsing JSON body
 app.use(express.json());
 
+// Test
 app.get('/', (req, res) => {
   res.status(200).json({
-    message: 'Welcome to Task Management API',
-    status: 'OK',
+    message: 'API is Healthy',
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Main API routes
+app.use('/api', apiRoutes);
+
+app.listen(config.port, () => {
+  console.log(`Server is running on http://localhost:${config.port}`);
 });
