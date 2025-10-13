@@ -19,4 +19,6 @@ router.get('/me', protect, (req, res) => {
   res.status(200).json({ message: 'Berhasil mengakses route ini', user: req.user });
 })
 
+router.post('/refresh', authController.refresh);
+
 module.exports = router;

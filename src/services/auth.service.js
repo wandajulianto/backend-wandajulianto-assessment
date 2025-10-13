@@ -30,32 +30,49 @@ class AuthService {
 
   async loginUser(email, password) {
     const user = await userRepository.findUserByEmail(email);
-    if (!user) {
-      throw new Error('Email belum terdaftar');
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      throw new Error('Email atau password salah');
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      throw new Error('Password salah');
-    }
+    // Generate access token
+    const accessToken = this.generateToken(user, config.jwt.secret, config.jwt.expiresIn);
 
+    // Generate refresh token
+    const refreshToken = this.generateToken(user, config.jwt.refreshSecret, config.jwt.refreshExpiresIn);
+
+    // Save refresh token to database
+    await userRepository.updateUserById(user._id, { refreshToken });
+
+    return { accessToken, refreshToken };
+  }
+
+  // Create helper method to generate token
+  generateToken(user, secret, expiresIn) {
     const payload = {
       id: user._id,
       role: user.role,
     };
 
-    const token = jwt.sign(payload, config.jwt.secret, {
-      expiresIn: config.jwt.expiresIn,
-    });
+    return jwt.sign(payload, secret, { expiresIn });
+  }
 
-    return {
-      token,
-      user: {
-        id: user._id,
-        username: user.username,
-        role: user.role,
-      },
-    };
+  async refreshToken(token) {
+    try {
+      // 1. Verify token
+      const decoded = jwt.verify(token, config.jwt.refreshSecret);
+      const user = await userRepository.findUserById(decoded.id);
+
+      // 2. Check if refresh token is valid
+      if (!user || user.refreshToken !== token) {
+        throw new Error('Token tidak valid');
+      }
+
+      // 3. Generate new access token
+      const accessToken = this.generateToken(user, config.jwt.secret, config.jwt.expiresIn);
+      return { accessToken };
+    } catch (error) {
+      throw new Error('Token tidak valid atau sudah kadaluarsa');
+    }
   }
 }
 

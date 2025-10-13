@@ -29,6 +29,20 @@ class AuthController {
       res.status(401).json({ message: error.message });
     }
   }
+
+  async refresh(req, res, next) {
+    try {
+      const { refreshToken } = req.body;
+      if (!refreshToken) {
+        return res.status(401).json({ message: 'Refresh token tidak ditemukan' });
+      }
+
+      const { accessToken } = await authService.refreshToken(refreshToken);
+      res.status(200).json({ accessToken });
+    } catch (error) {
+      res.status(401).json({ messaage: error.message });
+    }
+  }
 }
 
 module.exports = new AuthController();
