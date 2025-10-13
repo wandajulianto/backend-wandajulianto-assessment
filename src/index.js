@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const config = require('./config');
+const connectDB = require('./config/database');
 const apiRoutes = require('./api/routes');
 
 const app = express();
@@ -17,6 +18,9 @@ app.get('/', (req, res) => {
 
 // Main API routes
 app.use('/api', apiRoutes);
+
+// Connect to MongoDB
+connectDB();
 
 app.listen(config.port, () => {
   console.log(`Server is running on http://localhost:${config.port}`);
