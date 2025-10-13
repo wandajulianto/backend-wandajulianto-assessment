@@ -11,4 +11,12 @@ router.post(
   authController.register // 3. If validation is successful, call the controller
 );
 
+router.post('/login', authController.login);
+
+// Test middleware
+const protect = require('../middlewares/auth.middleware');
+router.get('/me', protect, (req, res) => {
+  res.status(200).json({ message: 'Berhasil mengakses route ini', user: req.user });
+})
+
 module.exports = router;
