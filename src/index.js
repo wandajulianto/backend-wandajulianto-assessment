@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const path = require('path');
 const config = require('./config');
 const connectDB = require('./config/database');
 const apiRoutes = require('./api/routes');
@@ -8,6 +9,9 @@ const app = express();
 
 // Middleware for parsing JSON body
 app.use(express.json());
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Test
 app.get('/', (req, res) => {

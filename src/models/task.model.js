@@ -28,6 +28,9 @@ const TaskSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
+  attachments: {
+    type: String,
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Task', TaskSchema);
