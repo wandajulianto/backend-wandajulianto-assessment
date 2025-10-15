@@ -16,13 +16,18 @@ class TaskController {
 
   async getAllTasks(req, res, next) {
     try {
-      const tasks = await taskService.getAllTasks();
-      res.status(200).json({
-        message: 'Sukses mendapatkan semua tugas',
-        data: tasks
-      });
+      // Get query params from URL
+      const options = {
+        status: req.query.status,
+        priority: req.query.priority,
+        sortBy: req.query.sortBy,
+        limit: parseInt(req.query.limit, 10) || 10, // Default limit 10
+        page: parseInt(req.query.page, 10) || 1, // Default page 1
+      };
+      const result = await taskService.getAllTasks(options);
+      res.status(200).json(result);
     } catch (error) {
-      res.status(400).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
 
