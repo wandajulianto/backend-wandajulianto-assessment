@@ -1,4 +1,5 @@
 const taskRepository = require('../repositories/task.repository');
+const ErrorHandler = require('../utils/errorHandler');
 
 class TaskService {
   async createTask(taskData, userId) {
@@ -14,7 +15,7 @@ class TaskService {
   async getTaskById(id) {
     const task = await taskRepository.findTaskById(id);
     if (!task) {
-      throw new Error('Tugas tidak ditemukan');
+      throw new ErrorHandler(404, 'Tugas tidak ditemukan');
     }
 
     return task;
@@ -23,7 +24,7 @@ class TaskService {
   async updateTaskById(id, updateData) {
     const task = await taskRepository.updateTaskById(id, updateData);
     if (!task) {
-      throw new Error('Tugas tidak ditemukan');
+      throw new ErrorHandler(404, 'Tugas tidak ditemukan');
     }
 
     return task;
@@ -32,7 +33,7 @@ class TaskService {
   async deleteTaskById(id) {
     const task = await taskRepository.deleteTaskById(id);
     if (!task) {
-      throw new Error('Tugas tidak ditemukan');
+      throw new ErrorHandler(404, 'Tugas tidak ditemukan');
     }
 
     return { message: 'Tugas berhasil dihapus' };
@@ -40,7 +41,7 @@ class TaskService {
 
   async addTaskAttachment(taskId, file) {
     if (!file) {
-      throw new Error('File tidak ditemukan');
+      throw new ErrorHandler(404, 'File tidak ditemukan');
     }
 
     // Save path file, not the file itself

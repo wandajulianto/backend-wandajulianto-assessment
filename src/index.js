@@ -4,7 +4,7 @@ const path = require('path');
 const config = require('./config');
 const connectDB = require('./config/database');
 const apiRoutes = require('./api/routes');
-
+const errorHandler = require('./api/middlewares/error.middleware');
 const app = express();
 
 // Middleware for parsing JSON body
@@ -25,6 +25,9 @@ app.use('/api', apiRoutes);
 
 // Connect to MongoDB
 connectDB();
+
+// Error handling middleware
+app.use(errorHandler);
 
 app.listen(config.port, () => {
   console.log(`Server is running on http://localhost:${config.port}`);

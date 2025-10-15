@@ -1,48 +1,41 @@
 const authService = require('../../services/auth.service');
+const ErrorHandler = require('../../utils/errorHandler');
+
+// Wrapper to handle async errors without needing try-catch in every method
+const catchAsync = fn => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
 
 class AuthController {
-  async register(req, res, next) {
-    try {
-      const user = await authService.registerUser(req.body);
-      res.status(201).json({
-        message: 'Daftar akun berhasil',
-        data: user,
-      });
-    } catch (error) {
-      // TODO: Handle error
-      res.status(400).json({ message: error.message });
-    }
-  }
+  register = catchAsync(async (req, res, next) => {
+    const user = await authService.registerUser(req.body);
+    res.status(201).json({
+      message: 'Daftar akun berhasil',
+      data: user,
+    });
+  });
 
-  async login(req, res, next) {
-    try {
-      const { email, password } = req.body;
-      const { accessToken, refreshToken } = await authService.loginUser(email, password);
-      res.status(200).json({
-        message: 'Login berhasil',
-        data: {
-          accessToken,
-          refreshToken,
-        },
-      });
-    } catch (error) {
-      res.status(401).json({ message: error.message });
-    }
-  }
+  login = catchAsync(async (req, res, next) => {
+    const { email, password } = req.body;
+    const { accessToken, refreshToken } = await authService.loginUser(email, password);
+    res.status(200).json({
+      message: 'Login berhasil',
+      data: {
+        accessToken,
+        refreshToken,
+      },
+    });
+  });
 
-  async refresh(req, res, next) {
-    try {
-      const { refreshToken } = req.body;
-      if (!refreshToken) {
-        return res.status(401).json({ message: 'Refresh token tidak ditemukan' });
-      }
-
-      const { accessToken } = await authService.refreshToken(refreshToken);
-      res.status(200).json({ accessToken });
-    } catch (error) {
-      res.status(401).json({ messaage: error.message });
+  refresh = catchAsync(async (req, res, next) => {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      throw new ErrorHandler(401, 'Refresh token tidak ditemukan');
     }
-  }
+
+    const { accessToken } = await authService.refreshToken(refreshToken);
+    res.status(200).json({ accessToken });
+  });
 }
 
 module.exports = new AuthController();
