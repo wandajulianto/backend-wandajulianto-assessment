@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const userRepository = require('../repositories/user.repository');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
+const ErrorHandler = require('../utils/errorHandler');
 
 class AuthService {
   async registerUser(userData) {
@@ -10,7 +11,7 @@ class AuthService {
     // Check if user email already exists
     const existingUser = await userRepository.findUserByEmail(email);
     if (existingUser) {
-      throw new Error('Email sudah terdaftar');
+      throw new ErrorHandler(400, 'Email sudah terdaftar');
     }
 
     // Hash password
@@ -31,7 +32,7 @@ class AuthService {
   async loginUser(email, password) {
     const user = await userRepository.findUserByEmail(email);
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new Error('Email atau password salah');
+      throw new ErrorHandler(400, 'Email atau password salah');
     }
 
     // Generate access token
@@ -64,14 +65,14 @@ class AuthService {
 
       // 2. Check if refresh token is valid
       if (!user || user.refreshToken !== token) {
-        throw new Error('Token tidak valid');
+        throw new ErrorHandler(400, 'Token tidak valid');
       }
 
       // 3. Generate new access token
       const accessToken = this.generateToken(user, config.jwt.secret, config.jwt.expiresIn);
       return { accessToken };
     } catch (error) {
-      throw new Error('Token tidak valid atau sudah kadaluarsa');
+      throw new ErrorHandler(400, 'Token tidak valid atau sudah kadaluarsa');
     }
   }
 }
