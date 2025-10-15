@@ -63,6 +63,18 @@ class TaskController {
       res.status(400).json({ message: error.message });
     }
   }
+
+  async uploadAttachment(req, res, next) {
+    try {
+      const task = await taskService.addTaskAttachment(req.params.id, req.file);
+      res.status(200).json({
+        message: 'Sukses menambahkan file',
+        data: task
+      })
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
 }
 
 module.exports = new TaskController();

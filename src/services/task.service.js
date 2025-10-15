@@ -37,6 +37,16 @@ class TaskService {
 
     return { message: 'Tugas berhasil dihapus' };
   }
+
+  async addTaskAttachment(taskId, file) {
+    if (!file) {
+      throw new Error('File tidak ditemukan');
+    }
+
+    // Save path file, not the file itself
+    const attachmentPath = file.path;
+    return await taskRepository.updateTaskById(taskId, { attachments: attachmentPath });
+  }
 }
 
 module.exports = new TaskService();
