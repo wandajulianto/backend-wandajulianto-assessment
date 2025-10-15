@@ -15,11 +15,13 @@ const TaskSchema = new Schema({
     type: String,
     enum: ['To Do', 'In Progress', 'Done'],
     default: 'To Do',
+    index: true,
   },
   priority: {
     type: String,
     enum: ['Low', 'Medium', 'High'],
     default: 'Medium',
+    index: true,
   },
   dueDate: {
     type: Date,
